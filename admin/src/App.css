@@ -1,0 +1,115 @@
+/* Layout wrapper */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 250px;
+  position: fixed;
+  height: 100vh;
+  background: #2c3e50;
+  z-index: 100;
+  transform: translateX(0); /* Show sidebar by default on desktop */
+  transition: transform 0.3s ease;
+}
+
+/* Sidebar hidden by default on mobile */
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    z-index: 101;
+  }
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+/* Remove margin-left on mobile */
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Admin content container */
+.admin-content {
+  padding: 20px clamp(12px, 4vw, 24px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix layout spacing */
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 16px;
+  }
+}
+@media (max-width: 576px) {
+  .admin-content {
+    padding: 12px;
+  }
+}
+
+/* Sticky navbar */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+/* Hamburger button for mobile */
+.hamburger-btn {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 110;
+  background: #2c3e50;
+  color: white;
+  font-size: 1.8rem;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 992px) {
+  .hamburger-btn {
+    display: block;
+  }
+}
+
+/* Optional overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 99;
+}
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0 !important;  /* ✅ Force reset on mobile */
+    width: 100%;                 /* ✅ Prevent overflow */
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .admin-content {
+    padding: 20px clamp(12px, 5vw, 24px); /* ✅ Padding for content, not layout */
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

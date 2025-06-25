@@ -1,0 +1,44 @@
+/* Admin Layout */
+.admin {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f6fa;
+}
+
+/* Main content area */
+.admin-content {
+  flex: 1;
+  margin-left: 250px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .admin-content {
+    margin-left: 0;
+    padding: 1.5rem;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 1000;
+    height: 100vh;
+  }
+  
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .admin-content.shifted {
+    margin-left: 250px;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 576px) {
+  .admin-content {
+    padding: 1rem;
+  }
+}
