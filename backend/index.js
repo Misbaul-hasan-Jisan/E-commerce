@@ -22,7 +22,14 @@ cloudinary.config({
 app.use(express.json());
 
 const corsOptions = {
-  origin: ['http://localhost:5174', 'https://your-production-frontend.com'],
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // allow non-browser requests or Postman
+    if(['http://localhost:5173', 'http://localhost:5174', 'https://your-production-frontend.com'].indexOf(origin) !== -1){
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
 };
