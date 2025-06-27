@@ -59,7 +59,7 @@ const CartItems = () => {
       });
 
       // Send order to backend
-      const response = await fetch('http://localhost:3000/checkout', {
+      const response = await fetch('https://e-commerce-8j0j.onrender.com/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

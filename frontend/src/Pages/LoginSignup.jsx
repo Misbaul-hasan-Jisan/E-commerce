@@ -21,7 +21,7 @@ const LoginSignup = () => {
 
   const login = async () => {
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch('https://e-commerce-8j0j.onrender.com/login', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -49,7 +49,7 @@ const LoginSignup = () => {
 
   const signUp = async () => {
     try {
-      const response = await fetch('http://localhost:3000/signup', {
+      const response = await fetch('https://e-commerce-8j0j.onrender.com/signup', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
