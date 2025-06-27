@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import Breadcrumbs from '../component/Breadcrumbs/Breadcrumb';
@@ -9,17 +9,18 @@ import RelatedProducts from '../component/RelatedProducts/RelatedProducts';
 const Product = () => {
   const { productId } = useParams();
   const { all_product } = useContext(ShopContext);
-  const [product, setProduct] = useState(null);
 
-  useEffect(() => {
-    if (all_product && all_product.length > 0) {
-      const foundProduct = all_product.find((item) => item.id === Number(productId));
-      setProduct(foundProduct);
-    }
-  }, [productId, all_product]);
+  const product = useMemo(() => {
+    if (!all_product || all_product.length === 0) return null;
+    return all_product.find((item) => item.id === Number(productId));
+  }, [all_product, productId]);
+
+  if (!all_product.length) {
+    return <div>Loading products...</div>; // Products not fetched yet
+  }
 
   if (!product) {
-    return <div>Loading product...</div>;
+    return <div>Product not found.</div>; // No product matches ID
   }
 
   return (

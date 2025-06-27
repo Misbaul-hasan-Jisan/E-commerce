@@ -10,6 +10,14 @@ const path = require("path");
 const cors = require("cors");
 const bcrypt = require('bcryptjs');
 const sanitizeHtml = require('sanitize-html');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 app.use(express.json());
 
@@ -25,16 +33,15 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://jisan:jisan2080@clust
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error("MongoDB Error:", err));
 
-const storage = multer.diskStorage({
-  destination: './upload/images',
-  filename: (req, file, cb) => {
-    cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
-  }
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ecommerce-products',
+    format: async (req, file) => 'png', // or 'jpg', 'webp' etc.
+    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
+  },
 });
-const upload = multer({ storage: multer.memoryStorage() });
-
-app.use('/images', express.static('upload/images'));
-
+const upload = multer({ storage });
 // Models
 const User = mongoose.model("User", {
   name: String,
@@ -96,16 +103,10 @@ const isAdmin = async (req, res, next) => {
 app.post("/upload", upload.single('product'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-    
-    // Upload to Cloudinary (recommended)
-    const result = await cloudinary.uploader.upload_stream({
-      resource_type: 'auto',
-      folder: 'ecommerce'
-    }).end(req.file.buffer);
 
-    res.json({ 
-      success: 1, 
-      image_url: result.secure_url 
+    res.json({
+      success: 1,
+      image_url: req.file.path  // <- Use this
     });
   } catch (error) {
     console.error("Upload error:", error);
@@ -200,6 +201,16 @@ app.post('/checkout', fetchUser, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+app.post('/update-cart', fetchUser, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { cartData: req.body.cartData });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 
 app.get('/admin/orders', fetchUser, isAdmin, async (req, res) => {
   try {

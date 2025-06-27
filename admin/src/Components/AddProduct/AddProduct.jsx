@@ -142,7 +142,7 @@ const AddProduct = () => {
                 <input 
                     onChange={imageHandler} 
                     type="file" 
-                    name='image' 
+                    name='product' 
                     id='file-input' 
                     hidden 
                     accept="image/*"
