@@ -19,7 +19,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.use(express.json());
 
 const corsOptions = {
   origin: function(origin, callback){
@@ -33,12 +32,14 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
 };
-
+app.options('*', cors(corsOptions));
+app.use(express.json());
 
 app.use(cors(corsOptions));
 mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://jisan:jisan2080@cluster0.5tsbtx1.mongodb.net/ecomerce")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error("MongoDB Error:", err));
+
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
