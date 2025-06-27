@@ -9,7 +9,7 @@ const ProductList = () => {
 
   const fetchAllProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3000/all-products");
+      const response = await fetch("https://e-commerce-8j0j.onrender.com/all-products");
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -34,7 +34,7 @@ const ProductList = () => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const response = await fetch("http://localhost:3000/remove-product", {
+      const response = await fetch("https://e-commerce-8j0j.onrender.com/remove-product", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),

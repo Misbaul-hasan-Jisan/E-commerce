@@ -3,7 +3,7 @@ export const checkAdminStatus = async () => {
   if (!token) return false;
 
   try {
-    const response = await fetch('http://localhost:3000/admin/verify', {
+    const response = await fetch('https://e-commerce-8j0j.onrender.com/admin/verify', {
       headers: {
         'auth-token': token,
       },

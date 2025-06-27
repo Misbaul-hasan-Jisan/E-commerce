@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/admin/login', {
+      const response = await fetch('https://e-commerce-8j0j.onrender.com/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

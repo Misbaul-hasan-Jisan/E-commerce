@@ -39,7 +39,7 @@ const AddProduct = () => {
             const formData = new FormData();
             formData.append('product', image);
             
-            const uploadRes = await fetch("http://localhost:3000/upload", {
+            const uploadRes = await fetch("https://e-commerce-8j0j.onrender.com/upload", {
                 method: 'POST',
                 body: formData
             });
@@ -54,7 +54,7 @@ const AddProduct = () => {
                 image: uploadData.image_url
             };
 
-            const addRes = await fetch("http://localhost:3000/add-product", {
+            const addRes = await fetch("https://e-commerce-8j0j.onrender.com/add-product", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product)

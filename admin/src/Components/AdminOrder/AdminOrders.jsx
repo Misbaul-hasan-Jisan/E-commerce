@@ -20,7 +20,7 @@ const AdminOrders = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:3000/admin/verify', {
+        const response = await fetch('https://e-commerce-8j0j.onrender.com/admin/verify', {
           headers: { 'auth-token': token }
         });
         
@@ -40,10 +40,10 @@ const AdminOrders = () => {
       try {
         const token = localStorage.getItem('auth-token');
         const [ordersRes, statsRes] = await Promise.all([
-          fetch(`http://localhost:3000/admin/orders?status=${filter === 'all' ? '' : filter}`, {
+          fetch(`https://e-commerce-8j0j.onrender.com/admin/orders?status=${filter === 'all' ? '' : filter}`, {
             headers: { 'auth-token': token }
           }),
-          fetch('http://localhost:3000/admin/stats', {
+          fetch('https://e-commerce-8j0j.onrender.com/admin/stats', {
             headers: { 'auth-token': token }
           })
         ]);
@@ -76,7 +76,7 @@ const AdminOrders = () => {
         )
       );
 
-      const response = await fetch(`http://localhost:3000/admin/orders/${orderId}/status`, {
+      const response = await fetch(`https://e-commerce-8j0j.onrender.com/admin/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

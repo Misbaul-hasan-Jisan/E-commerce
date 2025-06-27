@@ -19,7 +19,7 @@ const BulkUpload = () => {
         const formData = new FormData();
         formData.append('product', file);
 
-        const uploadRes = await fetch('http://localhost:3000/upload', {
+        const uploadRes = await fetch('https://e-commerce-8j0j.onrender.com/upload', {
           method: 'POST',
           body: formData,
         });
@@ -34,7 +34,7 @@ const BulkUpload = () => {
           image: image_url,
         };
 
-        await fetch('http://localhost:3000/add-product', {
+        await fetch('https://e-commerce-8j0j.onrender.com/add-product', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(finalProduct),
