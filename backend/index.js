@@ -12,8 +12,15 @@ const bcrypt = require('bcryptjs');
 const sanitizeHtml = require('sanitize-html');
 
 app.use(express.json());
-app.use(cors());
 
+const corsOptions = {
+  origin: ['http://localhost:5174', 'https://your-production-frontend.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
+};
+
+
+app.use(cors(corsOptions));
 mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://jisan:jisan2080@cluster0.5tsbtx1.mongodb.net/ecomerce")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error("MongoDB Error:", err));
@@ -24,7 +31,7 @@ const storage = multer.diskStorage({
     cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
   }
 });
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use('/images', express.static('upload/images'));
 
@@ -85,11 +92,25 @@ const isAdmin = async (req, res, next) => {
 };
 
 // Upload
-app.post("/upload", upload.single('product'), (req, res) => {
-  res.json({ 
-    success: 1, 
-    image_url: `https://e-commerce-8j0j.onrender.com/images/${req.file.filename}` 
-  });
+
+app.post("/upload", upload.single('product'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    
+    // Upload to Cloudinary (recommended)
+    const result = await cloudinary.uploader.upload_stream({
+      resource_type: 'auto',
+      folder: 'ecommerce'
+    }).end(req.file.buffer);
+
+    res.json({ 
+      success: 1, 
+      image_url: result.secure_url 
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "Upload failed" });
+  }
 });
 
 // Products
