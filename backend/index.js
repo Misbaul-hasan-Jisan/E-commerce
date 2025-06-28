@@ -243,5 +243,24 @@ app.get('/all-orders', async (req, res) => {
   }
 });
 
+// Update order status (NO authentication now)
+app.patch('/orders/:orderId/status', async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const { status } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    order.status = status;
+    await order.save();
+
+    res.json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
