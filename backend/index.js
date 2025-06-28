@@ -266,7 +266,7 @@ app.patch('/orders/:id/status', async (req, res) => {
   }
 });
 
-app.get('/orders/:id', fetchUser, async (req, res) => {
+app.get('/orders/:id', async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('userId', 'name email');
