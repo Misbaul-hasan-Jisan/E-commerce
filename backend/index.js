@@ -48,7 +48,7 @@ const User = mongoose.model("User", {
   name: String,
   email: { type: String, unique: true },
   password: String,
-  isAdmin: { type: Boolean, default: false },
+  isAdmin: { type: Boolean, default: true },
   cartData: { type: Array, default: [] },
   date: { type: Date, default: Date.now }
 });
