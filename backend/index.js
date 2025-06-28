@@ -231,7 +231,7 @@ app.post('/login', async (req, res) => {
   }
 });
 // Get all orders (No admin check)
-app.get('/all-orders', fetchUser, async (req, res) => {
+app.get('/all-orders', async (req, res) => {
   try {
     const orders = await Order.find()
       .populate('userId', 'name email')
@@ -242,5 +242,6 @@ app.get('/all-orders', fetchUser, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
