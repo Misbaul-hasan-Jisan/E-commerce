@@ -76,13 +76,13 @@ const Order = mongoose.model("Order", {
   status: { type: String, default: 'pending' },
   createdAt: { type: Date, default: Date.now }
 });
-
 const fetchUser = async (req, res, next) => {
   const token = req.header('auth-token');
   if (!token) return res.status(401).send({ error: "Please authenticate using valid token" });
   try {
     const data = jwt.verify(token, process.env.JWT_SECRET || 'secret_ecom');
     req.user = data.user;
+    console.log("fetchUser decoded user:", req.user);
     next();
   } catch (error) {
     res.status(401).send({ error: "Please authenticate using valid token" });
@@ -92,6 +92,7 @@ const fetchUser = async (req, res, next) => {
 const isAdmin = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
+    console.log("isAdmin checking user:", user);
     if (!user || !user.isAdmin) return res.status(403).json({ success: false, error: "Unauthorized access" });
     next();
   } catch (error) {
