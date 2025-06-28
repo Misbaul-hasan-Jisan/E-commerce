@@ -3,14 +3,17 @@ import "./CartItems.css";
 import { ShopContext } from "../../context/ShopContext";
 import remove_icon from "../Assets/cart_cross_icon.png";
 import { useNavigate } from "react-router-dom";
+import { FaCheckCircle } from "react-icons/fa";
 
 const CartItems = () => {
-  const { all_product, cartItems, removeFromCart, getTotalCartValue, addToCart } =
+  const { all_product, cartItems, removeFromCart, getTotalCartValue, addToCart, clearCart } =
     useContext(ShopContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [shippingAddress, setShippingAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [orderId, setOrderId] = useState(null);
   const navigate = useNavigate();
 
   const cartValue = getTotalCartValue();
@@ -18,7 +21,7 @@ const CartItems = () => {
   const totalAmount = cartValue + shippingFee;
 
   const handleCheckout = async () => {
-    // Convert cartItems object to array if needed
+    // Convert cartItems to array if needed
     const cartItemList = Array.isArray(cartItems) ? cartItems : Object.values(cartItems);
 
     if (cartItemList.length === 0) {
@@ -42,7 +45,7 @@ const CartItems = () => {
     try {
       const token = localStorage.getItem('auth-token');
       if (!token) {
-        navigate('/login'); // Redirect to login if not authenticated
+        navigate('/login');
         return;
       }
 
@@ -54,7 +57,8 @@ const CartItems = () => {
           name: product?.name || 'Unknown Product',
           size: item.size,
           quantity: item.quantity,
-          price: product?.new_price || 0
+          price: product?.new_price || 0,
+          image: product?.image || ''
         };
       });
 
@@ -81,7 +85,9 @@ const CartItems = () => {
       }
 
       const data = await response.json();
-      navigate('/order-confirmation', { state: { orderId: data.orderId } });
+      setShowConfirmation(true);
+      setOrderId(data.orderId);
+      clearCart(); // Clear the cart after successful order
 
     } catch (err) {
       setError(err.message);
@@ -104,7 +110,20 @@ const CartItems = () => {
       <hr />
       {cartItems.length === 0 ? (
         <div className="cart-empty">
-          <p>Your cart is empty</p>
+          {showConfirmation ? (
+            <div className="order-success-message">
+              <FaCheckCircle className="success-icon" />
+              <h3>Your order has been placed successfully!</h3>
+              <button 
+                onClick={() => navigate('/order-confirmation', { state: { orderId } })}
+                className="view-confirmation-btn"
+              >
+                View Order Details
+              </button>
+            </div>
+          ) : (
+            <p>Your cart is empty</p>
+          )}
         </div>
       ) : (
         cartItems.map((item) => {
@@ -161,38 +180,56 @@ const CartItems = () => {
             </div>
           </div>
 
-          {/* Shipping Address and Phone Number Fields */}
-          <div className="checkout-fields">
-            <div className="form-group">
-              <label>Shipping Address *</label>
-              <textarea
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-                rows="3"
-                required
-                placeholder="Enter your full shipping address"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Phone Number *</label>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="123-456-7890"
-                required
-              />
-            </div>
-          </div>
+          {!showConfirmation && (
+            <>
+              <div className="checkout-fields">
+                <div className="form-group">
+                  <label>Shipping Address *</label>
+                  <textarea
+                    value={shippingAddress}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                    rows="3"
+                    required
+                    placeholder="Enter your full shipping address"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Phone Number *</label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="123-456-7890"
+                    required
+                  />
+                </div>
+              </div>
 
-          <button 
-            onClick={handleCheckout} 
-            disabled={loading || cartItems.length === 0}
-            className={loading ? "checkout-loading" : ""}
-          >
-            {loading ? "Processing..." : "PROCEED TO CHECKOUT"}
-          </button>
+              <button 
+                onClick={handleCheckout} 
+                disabled={loading || cartItems.length === 0}
+                className={loading ? "checkout-loading" : ""}
+              >
+                {loading ? "Processing..." : "PROCEED TO CHECKOUT"}
+              </button>
+            </>
+          )}
+
+          {showConfirmation && (
+            <div className="confirmation-section">
+              <FaCheckCircle className="success-icon" />
+              <h3>Order Placed Successfully!</h3>
+              <p>Your order ID: #{orderId}</p>
+              <button 
+                onClick={() => navigate('/order-confirmation', { state: { orderId } })}
+                className="view-confirmation-btn"
+              >
+                View Full Order Details
+              </button>
+            </div>
+          )}
+
           {error && <div className="checkout-error">{error}</div>}
         </div>
         <div className="cartitems-promocode">

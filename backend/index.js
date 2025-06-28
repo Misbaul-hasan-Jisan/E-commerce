@@ -73,6 +73,11 @@ const Order = mongoose.model("Order", {
   shippingAddress: String,
   phoneNumber: String,
   status: { type: String, default: 'pending' },
+  statusHistory: [{
+    status: String,
+    changedAt: { type: Date, default: Date.now },
+    notes: String
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -261,6 +266,25 @@ app.patch('/orders/:id/status', async (req, res) => {
   }
 });
 
+app.get('/orders/:id', fetchUser, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('userId', 'name email');
+    
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Verify the requesting user owns this order or is admin
+    if (order.userId._id.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

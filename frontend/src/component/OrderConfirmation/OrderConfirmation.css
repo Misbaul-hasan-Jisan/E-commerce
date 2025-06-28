@@ -1,0 +1,84 @@
+.order-confirmation-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 10px;
+}
+
+.success-icon {
+  color: #4CAF50;
+  margin-right: 10px;
+}
+
+.status-timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.status-timeline::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ddd;
+  z-index: 1;
+}
+
+.stage {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.stage-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  background: #fff;
+  border: 3px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+.stage.active .stage-icon {
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.current-status {
+  font-size: 0.8rem;
+  color: #4CAF50;
+  margin-top: 5px;
+}
+
+/* Status colors */
+.status-pending { color: #FF9800; }
+.status-processing { color: #2196F3; }
+.status-shipped { color: #673AB7; }
+.status-delivered { color: #4CAF50; }
+
+.action-buttons {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-track {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-continue {
+  background: #4CAF50;
+  color: white;
+}
