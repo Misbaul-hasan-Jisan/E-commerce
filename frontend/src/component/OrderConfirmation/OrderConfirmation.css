@@ -190,4 +190,20 @@
   to { transform: rotate(360deg); }
 }
 
+.btn-myorders {
+  background-color: #0066cc;
+  color: white;
+  padding: 10px 16px;
+  margin-top: 10px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-myorders:hover {
+  background-color: #004999;
+}
+
 /* Rest of your existing styles... */

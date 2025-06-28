@@ -21,7 +21,6 @@ const CartItems = () => {
   const totalAmount = cartValue + shippingFee;
 
   const handleCheckout = async () => {
-    // Convert cartItems to array if needed
     const cartItemList = Array.isArray(cartItems) ? cartItems : Object.values(cartItems);
 
     if (cartItemList.length === 0) {
@@ -49,7 +48,6 @@ const CartItems = () => {
         return;
       }
 
-      // Prepare order items
       const orderItems = cartItemList.map(item => {
         const product = all_product.find(p => p.id === item.itemId);
         return {
@@ -62,7 +60,6 @@ const CartItems = () => {
         };
       });
 
-      // Send order to backend
       const response = await fetch('https://e-commerce-8j0j.onrender.com/checkout', {
         method: 'POST',
         headers: {
@@ -87,7 +84,7 @@ const CartItems = () => {
       const data = await response.json();
       setShowConfirmation(true);
       setOrderId(data.orderId);
-      clearCart(); // Clear the cart after successful order
+      clearCart();
 
     } catch (err) {
       setError(err.message);
@@ -230,8 +227,21 @@ const CartItems = () => {
             </div>
           )}
 
+          {/* ✅ Show My Orders button always if logged in */}
+          {localStorage.getItem('auth-token') && (
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <button
+                onClick={() => navigate('/my-orders')}
+                className="btn-myorders"
+              >
+                View My Orders
+              </button>
+            </div>
+          )}
+
           {error && <div className="checkout-error">{error}</div>}
         </div>
+
         <div className="cartitems-promocode">
           <p>If you have a promo code, enter it here.</p>
           <div className="cartitems-promobox">

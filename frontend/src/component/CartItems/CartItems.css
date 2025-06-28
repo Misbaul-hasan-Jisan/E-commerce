@@ -257,6 +257,21 @@ hr {
   margin-top: 15px;
   text-align: center;
 }
+.btn-myorders {
+  background-color: #0077cc;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.btn-myorders:hover {
+  background-color: #005fa3;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
