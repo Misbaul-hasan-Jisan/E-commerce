@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import Navbar from './Components/Navbar/Navbar';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AddProduct from './Components/AddProduct/AddProduct';
 import ProductList from './Components/ProductList/ProductList';
 import BulkUpload from './Components/BulkUpload/BulkUpload';
@@ -32,6 +32,8 @@ const App = () => {
         <Navbar />
         <div className='admin-content'>
           <Routes>
+            {/* Redirect root path to /admin/orders */}
+            <Route path="/" element={<Navigate to="/admin/orders" replace />} />
             <Route path='/bulk-upload' element={<BulkUpload />} />
             <Route path='/add-product' element={<AddProduct />} />
             <Route path='/list-product' element={<ProductList />} />

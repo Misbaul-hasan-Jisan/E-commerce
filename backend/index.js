@@ -21,7 +21,7 @@ cloudinary.config({
 });
 
 const corsOptions = {
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
 };
 
@@ -244,13 +244,13 @@ app.get('/all-orders', async (req, res) => {
 });
 
 // Update order status (NO authentication now)
-app.patch('/orders/:orderId/status', async (req, res) => {
+app.patch('/orders/:id/status', async (req, res) => {
   try {
-    const orderId = req.params.orderId;
+    const orderId = req.params.id;
     const { status } = req.body;
 
     const order = await Order.findById(orderId);
-    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (!order) return res.status(404).json({ error: "Order not found" });
 
     order.status = status;
     await order.save();
