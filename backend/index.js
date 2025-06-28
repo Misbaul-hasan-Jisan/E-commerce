@@ -314,7 +314,7 @@ app.get('/orders/by-email', async (req, res) => {
   }
 });
 
-app.get('/orders/my', fetchUser, async (req, res) => {
+app.get('/my-orders', fetchUser, async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.json({ success: true, orders });
