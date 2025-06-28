@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './App.css';
 import Navbar from './Components/Navbar/Navbar';
 import { Routes, Route } from 'react-router-dom';
-import AdminLogin from './Pages/Admin/AdminLogin';
 import AddProduct from './Components/AddProduct/AddProduct';
 import ProductList from './Components/ProductList/ProductList';
 import BulkUpload from './Components/BulkUpload/BulkUpload';
@@ -36,7 +35,6 @@ const App = () => {
             <Route path='/bulk-upload' element={<BulkUpload />} />
             <Route path='/add-product' element={<AddProduct />} />
             <Route path='/list-product' element={<ProductList />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path='/admin/orders' element={<AdminOrders />} />
           </Routes>
         </div>

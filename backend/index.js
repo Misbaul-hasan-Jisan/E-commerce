@@ -1,4 +1,4 @@
-// server.js (All-in-One with Admin Login)
+// server.js (Admin Removed)
 require('dotenv').config();
 const port = process.env.PORT || 3000;
 const express = require("express");
@@ -12,6 +12,7 @@ const bcrypt = require('bcryptjs');
 const sanitizeHtml = require('sanitize-html');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 // Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -19,36 +20,34 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
 const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
 };
 
-
 app.use(express.json());
-
 app.use(cors(corsOptions));
+
 mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://jisan:jisan2080@cluster0.5tsbtx1.mongodb.net/ecomerce")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error("MongoDB Error:", err));
 
-
+// Cloudinary storage config
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'ecommerce-products',
-    format: async (req, file) => 'png', // or 'jpg', 'webp' etc.
+    format: async (req, file) => 'png',
     public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
   },
 });
 const upload = multer({ storage });
+
 // Models
 const User = mongoose.model("User", {
   name: String,
   email: { type: String, unique: true },
   password: String,
-  isAdmin: { type: Boolean, default: true },
   cartData: { type: Array, default: [] },
   date: { type: Date, default: Date.now }
 });
@@ -76,39 +75,27 @@ const Order = mongoose.model("Order", {
   status: { type: String, default: 'pending' },
   createdAt: { type: Date, default: Date.now }
 });
+
+// Middleware: fetchUser
 const fetchUser = async (req, res, next) => {
   const token = req.header('auth-token');
   if (!token) return res.status(401).send({ error: "Please authenticate using valid token" });
   try {
     const data = jwt.verify(token, process.env.JWT_SECRET || 'secret_ecom');
     req.user = data.user;
-    console.log("fetchUser decoded user:", req.user);
     next();
   } catch (error) {
     res.status(401).send({ error: "Please authenticate using valid token" });
   }
 };
 
-const isAdmin = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
-    console.log("isAdmin checking user:", user);
-    if (!user || !user.isAdmin) return res.status(403).json({ success: false, error: "Unauthorized access" });
-    next();
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
 // Upload
-
 app.post("/upload", upload.single('product'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
     res.json({
       success: 1,
-      image_url: req.file.path  // <- Use this
+      image_url: req.file.path
     });
   } catch (error) {
     console.error("Upload error:", error);
@@ -163,10 +150,7 @@ app.get('/new-collection', async (req, res) => {
     let newProducts = products.slice(-8);
     res.send(newProducts);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -175,13 +159,9 @@ app.post('/getcart', fetchUser, async (req, res) => {
     let userData = await User.findOne({ _id: req.user.id });
     res.json(userData.cartData || []);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
-
 
 // Orders
 app.post('/checkout', fetchUser, async (req, res) => {
@@ -208,16 +188,6 @@ app.post('/update-cart', fetchUser, async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.user.id, { cartData: req.body.cartData });
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-
-app.get('/admin/orders', fetchUser, isAdmin, async (req, res) => {
-  try {
-    const orders = await Order.find().populate('userId', 'name email').sort({ createdAt: -1 });
-    res.json({ success: true, orders });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -260,76 +230,14 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
-// Admin Login
-app.post('/admin/login', async (req, res) => {
+// Get all orders (No admin check)
+app.get('/all-orders', fetchUser, async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const admin = await User.findOne({ email });
+    const orders = await Order.find()
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
 
-    if (!admin || !admin.isAdmin) {
-      return res.status(403).json({ success: false, error: "Access denied" });
-    }
-
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) return res.json({ success: false, error: "Wrong password" });
-
-    const token = jwt.sign({ user: { id: admin.id } }, process.env.JWT_SECRET || 'secret_ecom');
-    res.json({ success: true, token });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-// Add these to your existing server.js
-
-// Admin-specific endpoints
-app.get('/admin/verify', fetchUser, isAdmin, (req, res) => {
-  res.json({ success: true, isAdmin: true });
-});
-
-app.patch('/admin/orders/:id/status', fetchUser, isAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-    
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, error: "Invalid status" });
-    }
-
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    ).populate('userId', 'name email');
-
-    if (!order) {
-      return res.status(404).json({ success: false, error: "Order not found" });
-    }
-
-    res.json({ success: true, order });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.get('/admin/stats', fetchUser, isAdmin, async (req, res) => {
-  try {
-    const [totalOrders, pendingOrders, totalRevenue] = await Promise.all([
-      Order.countDocuments(),
-      Order.countDocuments({ status: 'pending' }),
-      Order.aggregate([
-        { $group: { _id: null, total: { $sum: "$total" } } }
-      ])
-    ]);
-
-    res.json({
-      success: true,
-      stats: {
-        totalOrders,
-        pendingOrders,
-        totalRevenue: totalRevenue[0]?.total || 0
-      }
-    });
+    res.json({ success: true, orders });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

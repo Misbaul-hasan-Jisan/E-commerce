@@ -4,7 +4,6 @@ import './AdminOrders.css';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
@@ -12,49 +11,29 @@ const AdminOrders = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const verifyAdmin = async () => {
-      const token = localStorage.getItem('auth-token');
-      if (!token) {
-        navigate('/admin/login');
-        return;
-      }
-
-      try {
-        const response = await fetch('https://e-commerce-8j0j.onrender.com/admin/verify', {
-          headers: { 'auth-token': token }
-        });
-        
-        if (!response.ok) {
-          navigate('/admin/login');
-        }
-      } catch (err) {
-        navigate('/admin/login');
-      }
-    };
-
-    verifyAdmin();
+    const token = localStorage.getItem('auth-token');
+    if (!token) {
+      navigate('/login'); // Redirect to user login
+    }
   }, [navigate]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchOrders = async () => {
       try {
         const token = localStorage.getItem('auth-token');
-        const [ordersRes, statsRes] = await Promise.all([
-          fetch(`https://e-commerce-8j0j.onrender.com/admin/orders?status=${filter === 'all' ? '' : filter}`, {
-            headers: { 'auth-token': token }
-          }),
-          fetch('https://e-commerce-8j0j.onrender.com/admin/stats', {
-            headers: { 'auth-token': token }
-          })
-        ]);
 
-        if (!ordersRes.ok || !statsRes.ok) throw new Error('Failed to fetch data');
+        const response = await fetch(`https://e-commerce-8j0j.onrender.com/all-orders`, {
+          headers: { 'auth-token': token }
+        });
 
-        const ordersData = await ordersRes.json();
-        const statsData = await statsRes.json();
+        if (!response.ok) throw new Error('Failed to fetch orders');
 
-        setOrders(ordersData.orders);
-        setStats(statsData.stats);
+        const data = await response.json();
+        const filtered = filter === 'all'
+          ? data.orders
+          : data.orders.filter(order => order.status === filter);
+
+        setOrders(filtered);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -62,21 +41,20 @@ const AdminOrders = () => {
       }
     };
 
-    fetchData();
+    fetchOrders();
   }, [filter]);
 
- const updateOrderStatus = async (orderId, newStatus) => {
+  const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('auth-token');
-      
-      // Add loading state for this specific order
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
+
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
           order._id === orderId ? { ...order, updating: true } : order
         )
       );
 
-      const response = await fetch(`https://e-commerce-8j0j.onrender.com/admin/orders/${orderId}/status`, {
+      const response = await fetch(`https://e-commerce-8j0j.onrender.com/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -90,60 +68,39 @@ const AdminOrders = () => {
         throw new Error(errorData.error || 'Failed to update status');
       }
 
-      // Optimistic UI update - immediately reflect the change
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order._id === orderId 
-            ? { ...order, status: newStatus, updating: false } 
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order._id === orderId
+            ? { ...order, status: newStatus, updating: false }
             : order
         )
       );
-      
-      // Also update the selectedOrder if it's the one being edited
+
       if (selectedOrder?._id === orderId) {
-        setSelectedOrder(prev => ({ 
-          ...prev, 
+        setSelectedOrder(prev => ({
+          ...prev,
           status: newStatus,
-          updating: false 
+          updating: false
         }));
       }
-
     } catch (err) {
       setError(err.message);
-      // Revert the status if the update failed
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order._id === orderId 
-            ? { ...order, updating: false } 
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order._id === orderId
+            ? { ...order, updating: false }
             : order
         )
       );
     }
   };
-  
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
-      
-      {stats && (
-        <div className="stats-container">
-          <div className="stat-card">
-            <h3>Total Orders</h3>
-            <p>{stats.totalOrders}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Pending Orders</h3>
-            <p>{stats.pendingOrders}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Total Revenue</h3>
-            <p>${stats.totalRevenue.toFixed(2)}</p>
-          </div>
-        </div>
-      )}
+      <h1>Orders</h1>
 
       <div className="orders-section">
         <div className="filters">
@@ -184,10 +141,11 @@ const AdminOrders = () => {
                     <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                     <td>${order.total?.toFixed(2)}</td>
                     <td>
-                      <select 
+                      <select
                         value={order.status}
                         onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                         className={`status-${order.status}`}
+                        disabled={order.updating}
                       >
                         <option value="pending">Pending</option>
                         <option value="processing">Processing</option>
@@ -215,9 +173,9 @@ const AdminOrders = () => {
             <button className="close-btn" onClick={() => setSelectedOrder(null)}>
               &times;
             </button>
-            
+
             <h2>Order Details</h2>
-            
+
             <div className="order-details">
               <div className="customer-info">
                 <h3>Customer</h3>
@@ -235,7 +193,7 @@ const AdminOrders = () => {
                 <p>Status: {selectedOrder.status}</p>
                 <p>Total: ${selectedOrder.total?.toFixed(2)}</p>
               </div>
-              
+
               <div className="items-list">
                 <h3>Items</h3>
                 <table>

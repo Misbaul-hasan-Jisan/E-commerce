@@ -25,7 +25,7 @@ const Admin = () => {
         <FaBars />
       </button>
       
-      <Sidebar className={sidebarOpen ? 'active' : ''} />
+      <Sidebar isMobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       <div className={`admin-content ${sidebarOpen ? 'shifted' : ''}`}>
         <Routes>
@@ -33,7 +33,6 @@ const Admin = () => {
           <Route path='/add-product' element={<AddProduct />} />
           <Route path='/list-product' element={<ProductList />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/login" element={<AdminOrders />} />
         </Routes>
       </div>
     </div>
