@@ -285,6 +285,27 @@ app.get('/orders/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Get orders by email
+app.get('/orders/by-email', async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    const orders = await Order.find()
+      .populate({
+        path: 'userId',
+        match: { email: email },
+        select: 'name email'
+      })
+      .sort({ createdAt: -1 });
+
+    const filteredOrders = orders.filter(order => order.userId !== null);
+    
+    res.json(filteredOrders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

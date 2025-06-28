@@ -1,29 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaSpinner, FaCheckCircle, FaTruck, FaBoxOpen } from 'react-icons/fa';
-import './OrderConfirmation.css'; // Create this file for styling
+import { FaSpinner, FaCheckCircle, FaTruck, FaBoxOpen, FaHistory } from 'react-icons/fa';
+import './OrderConfirmation.css';
 
 const OrderConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const orderId = location.state?.orderId;
+  const [orderId, setOrderId] = useState(location.state?.orderId || new URLSearchParams(location.search).get('orderId'));
+  const [email, setEmail] = useState('');
+  const [orders, setOrders] = useState([]);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showAllOrders, setShowAllOrders] = useState(false);
 
-  // Fetch order details (replace with your API endpoint)
+  // Fetch order details
   useEffect(() => {
-    if (!orderId) {
+    if (!orderId && !email) {
       navigate('/');
       return;
     }
 
-    const fetchOrder = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`https://e-commerce-8j0j.onrender.com/orders/${orderId}`);
-        if (!response.ok) throw new Error('Order not found');
-        const data = await response.json();
-        setOrder(data);
+        setLoading(true);
+        
+        if (orderId) {
+          const response = await fetch(`https://e-commerce-8j0j.onrender.com/orders/${orderId}`);
+          if (!response.ok) throw new Error('Order not found');
+          const data = await response.json();
+          setOrder(data);
+          setEmail(data.userId?.email || '');
+        }
+        
+        if (email) {
+          const ordersResponse = await fetch(`https://e-commerce-8j0j.onrender.com/orders/by-email?email=${encodeURIComponent(email)}`);
+          if (!ordersResponse.ok) throw new Error('Failed to fetch orders');
+          const ordersData = await ordersResponse.json();
+          setOrders(ordersData);
+        }
+        
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,10 +47,17 @@ const OrderConfirmation = () => {
       }
     };
 
-    fetchOrder();
-  }, [orderId, navigate]);
+    fetchData();
+  }, [orderId, email, navigate]);
 
-  if (!orderId) return null;
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    if (email) {
+      setOrderId(null);
+      setShowAllOrders(true);
+    }
+  };
+
   if (loading) return <div className="loading-spinner"><FaSpinner className="spinner" /></div>;
   if (error) return <div className="error-message">Error: {error}</div>;
 
@@ -48,42 +71,95 @@ const OrderConfirmation = () => {
 
   return (
     <div className="order-confirmation-container">
-      <h1><FaCheckCircle className="success-icon" /> Order Confirmed!</h1>
-      <p className="order-id">Order #: <strong>{orderId}</strong></p>
+      {!order && !showAllOrders && (
+        <div className="email-lookup">
+          <h2>View Your Orders</h2>
+          <form onSubmit={handleEmailSubmit}>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+            <button type="submit">View Orders</button>
+          </form>
+        </div>
+      )}
 
-      {/* Status Timeline */}
-      <div className="status-timeline">
-        {statusStages.map((stage) => (
-          <div 
-            key={stage.id}
-            className={`stage ${stage.active.includes(order?.status) ? 'active' : ''}`}
-          >
-            <div className="stage-icon">
-              {stage.icon}
-            </div>
-            <p>{stage.name}</p>
-            {stage.active.includes(order?.status) && (
-              <div className="current-status">Current Status</div>
-            )}
+      {order && (
+        <>
+          <h1><FaCheckCircle className="success-icon" /> Order Confirmed!</h1>
+          <p className="order-id">Order #: <strong>{orderId}</strong></p>
+
+          {/* Status Timeline */}
+          <div className="status-timeline">
+            {statusStages.map((stage) => (
+              <div 
+                key={stage.id}
+                className={`stage ${stage.active.includes(order?.status) ? 'active' : ''}`}
+              >
+                <div className="stage-icon">
+                  {stage.icon}
+                </div>
+                <p>{stage.name}</p>
+                {stage.active.includes(order?.status) && (
+                  <div className="current-status">Current Status</div>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Order Summary */}
-      <div className="order-summary">
-        <h3>Order Details</h3>
-        <p><strong>Status:</strong> <span className={`status-${order?.status}`}>{order?.status}</span></p>
-        <p><strong>Date:</strong> {new Date(order?.createdAt).toLocaleString()}</p>
-        <p><strong>Total:</strong> ${order?.total?.toFixed(2)}</p>
-      </div>
+          {/* Order Summary */}
+          <div className="order-summary">
+            <h3>Order Details</h3>
+            <p><strong>Status:</strong> <span className={`status-${order?.status}`}>{order?.status}</span></p>
+            <p><strong>Date:</strong> {new Date(order?.createdAt).toLocaleString()}</p>
+            <p><strong>Total:</strong> ${order?.total?.toFixed(2)}</p>
+          </div>
+        </>
+      )}
 
-      {/* Action Buttons */}
+      {showAllOrders && (
+        <div className="all-orders">
+          <h2><FaHistory /> Your Order History</h2>
+          {orders.length === 0 ? (
+            <p>No orders found for this email</p>
+          ) : (
+            <div className="orders-list">
+              {orders.map((o) => (
+                <div key={o._id} className="order-card">
+                  <p><strong>Order #:</strong> {o._id.slice(0, 8)}</p>
+                  <p><strong>Date:</strong> {new Date(o.createdAt).toLocaleDateString()}</p>
+                  <p><strong>Status:</strong> <span className={`status-${o.status}`}>{o.status}</span></p>
+                  <p><strong>Total:</strong> ${o.total?.toFixed(2)}</p>
+                  <button 
+                    onClick={() => {
+                      setOrderId(o._id);
+                      setOrder(o);
+                      setShowAllOrders(false);
+                    }}
+                    className="view-order-btn"
+                  >
+                    View Details
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Always visible action buttons */}
       <div className="action-buttons">
         <button 
           className="btn-track"
-          onClick={() => navigate(`/track-order/${orderId}`)}
+          onClick={() => {
+            if (orderId) navigate(`/track-order/${orderId}`);
+            else if (email) navigate(`/order-history?email=${encodeURIComponent(email)}`);
+          }}
         >
-          Track Your Order
+          {orderId ? 'Track Your Order' : 'View Order History'}
         </button>
         <button 
           className="btn-continue"
