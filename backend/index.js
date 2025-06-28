@@ -266,23 +266,30 @@ app.patch('/orders/:id/status', async (req, res) => {
   }
 });
 
+// Get order by ID (No authentication now)
 app.get('/orders/:id', async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('userId', 'name email');
     
     if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+      return res.status(404).json({ 
+        success: false,
+        error: "Order not found" 
+      });
     }
 
-    // Verify the requesting user owns this order or is admin
-    if (order.userId._id.toString() !== req.user.id) {
-      return res.status(403).json({ error: "Unauthorized access" });
-    }
-
-    res.json(order);
+    res.json({
+      success: true,
+      order
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error fetching order:', error);
+    res.status(500).json({ 
+      success: false,
+      error: "Internal server error",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 // Get orders by email
