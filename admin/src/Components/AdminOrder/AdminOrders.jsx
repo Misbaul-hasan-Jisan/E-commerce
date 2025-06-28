@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './AdminOrders.css';
 
 const AdminOrders = () => {
@@ -8,23 +7,12 @@ const AdminOrders = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('auth-token');
-    if (!token) {
-      navigate('/login'); // Redirect to user login
-    }
-  }, [navigate]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem('auth-token');
-
-        const response = await fetch(`https://e-commerce-8j0j.onrender.com/all-orders`, {
-          headers: { 'auth-token': token }
-        });
+        // No token or auth header required
+        const response = await fetch(`https://e-commerce-8j0j.onrender.com/all-orders`);
 
         if (!response.ok) throw new Error('Failed to fetch orders');
 
@@ -46,19 +34,17 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem('auth-token');
-
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order._id === orderId ? { ...order, updating: true } : order
         )
       );
 
+      // No auth-token header needed here either
       const response = await fetch(`https://e-commerce-8j0j.onrender.com/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          'auth-token': token
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ status: newStatus })
       });
