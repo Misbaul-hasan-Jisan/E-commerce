@@ -1,5 +1,6 @@
+// src/pages/MyOrders.jsx
 import React, { useEffect, useState } from "react";
-import './MyOrders.css';
+import './MyOrders.css'; // Assuming you have some styles in MyOrders.css
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -27,19 +28,21 @@ const MyOrders = () => {
     fetchOrders();
   }, []);
 
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+
   return (
-    <div className="orders-container">
+    <div>
       <h2>My Orders</h2>
-      {error && <p className="error-message">Error: {error}</p>}
       {orders.length === 0 ? (
-        <p className="no-orders">You haven't placed any orders yet.</p>
+        <p>You haven't placed any orders yet.</p>
       ) : (
-        <ul className="orders-list">
+        <ul>
           {orders.map((order) => (
-            <li key={order._id} className="order-card">
-              <p className="order-id">Order #{order._id}</p>
-              <p className="order-status">Status: {order.status}</p>
-              <p className="order-total">Total: ${order.total}</p>
+            <li key={order._id}>
+              <p>Order #{order._id}</p>
+              <p>Status: {order.status}</p>
+              <p>Total: ${order.total}</p>
+              <hr />
             </li>
           ))}
         </ul>
@@ -49,4 +52,3 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
-// This component fetches and displays the user's orders from the backend.
