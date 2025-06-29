@@ -1,0 +1,103 @@
+/* Root container */
+.orders-container {
+  padding: 2rem 1rem;
+  max-width: 1000px;
+  margin: auto;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  background: linear-gradient(to right, #1f1c2c, #928dab);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Heading */
+.orders-container h2 {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* No orders message */
+.no-orders {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #eee;
+  margin-top: 2rem;
+}
+
+/* Order list */
+.orders-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Order card */
+.order-card {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Order details */
+.order-card p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.order-id {
+  font-weight: bold;
+  color: #ffd369;
+}
+
+.order-status {
+  color: #00ffab;
+  font-weight: 500;
+}
+
+.order-total {
+  color: #f5a623;
+}
+
+/* Error message */
+.error-message {
+  color: #ff4d4f;
+  background: #2f1b1b;
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1rem auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .orders-container {
+    padding: 1rem;
+  }
+
+  .orders-container h2 {
+    font-size: 2rem;
+  }
+
+  .order-card {
+    padding: 1.2rem;
+  }
+
+  .order-card p {
+    font-size: 1rem;
+  }
+}
