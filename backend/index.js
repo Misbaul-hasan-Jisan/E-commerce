@@ -21,6 +21,7 @@ cloudinary.config({
 });
 
 const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*', // Allow all origins or specify your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
 };
