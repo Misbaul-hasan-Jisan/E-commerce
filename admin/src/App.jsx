@@ -7,6 +7,7 @@ import ProductList from './Components/ProductList/ProductList';
 import BulkUpload from './Components/BulkUpload/BulkUpload';
 import Sidebar from './Components/Sidebar/Sidebar';
 import AdminOrders from './Components/AdminOrder/AdminOrders';
+import AdminLogin from './Pages/Admin/Login/AdminLogin';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -38,6 +39,7 @@ const App = () => {
             <Route path='/add-product' element={<AddProduct />} />
             <Route path='/list-product' element={<ProductList />} />
             <Route path='/admin/orders' element={<AdminOrders />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
           </Routes>
         </div>
       </div>

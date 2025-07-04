@@ -350,5 +350,19 @@ app.get('/my-orders', fetchUser, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+// Admin login
+app.post('/admin/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (email !== ADMIN_EMAIL || password !== ADMIN_PASS) {
+    return res.status(401).json({ success: false, error: "Invalid credentials" });
+  }
+
+  const token = jwt.sign({ admin: true }, process.env.JWT_SECRET || 'secret_ecom', {
+    expiresIn: "2h"
+  });
+
+  res.json({ success: true, token });
+});
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
