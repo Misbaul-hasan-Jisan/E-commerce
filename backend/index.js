@@ -21,10 +21,37 @@ cloudinary.config({
 });
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || '*', // Allow all origins or specify your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'auth-token']
+  origin: (origin, callback) => {
+    // 1. Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    // 2. Convert CORS_ORIGIN to array and clean URLs
+    const allowedOrigins = (process.env.CORS_ORIGIN || '')
+      .split(',')
+      .map(url => url.trim().replace(/\/$/, '')); // Remove trailing slashes
+
+    // 3. Check against allowed origins
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // 4. Special case for Render.com subdomains
+    const originHost = new URL(origin).hostname;
+    if (allowedOrigins.some(url => new URL(url).hostname === originHost)) {
+      return callback(null, true);
+    }
+
+    callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'auth-token'],
+  credentials: true,
+  // Critical for Render.com:
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cors(corsOptions));
