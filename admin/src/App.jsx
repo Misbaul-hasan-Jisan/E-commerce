@@ -34,7 +34,7 @@ const App = () => {
         <div className='admin-content'>
           <Routes>
             {/* Redirect root path to /admin/orders */}
-            <Route path="/" element={<Navigate to="/admin/orders" replace />} />
+            <Route path="/" element={<Navigate to="/admin/login" replace />} />
             <Route path='/bulk-upload' element={<BulkUpload />} />
             <Route path='/add-product' element={<AddProduct />} />
             <Route path='/list-product' element={<ProductList />} />

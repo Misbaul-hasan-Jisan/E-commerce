@@ -30,7 +30,7 @@ const Admin = () => {
       <div className={`admin-content ${sidebarOpen ? 'shifted' : ''}`}>
         <Routes>
           {/* Redirect root to /admin/orders */}
-          <Route path="/" element={<Navigate to="/admin/orders" replace />} />
+          <Route path="/" element={<Navigate to="/admin/login" replace />} />
           <Route path='/bulk-upload' element={<BulkUpload />} />
           <Route path='/add-product' element={<AddProduct />} />
           <Route path='/list-product' element={<ProductList />} />
