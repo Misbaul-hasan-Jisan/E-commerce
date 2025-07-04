@@ -71,6 +71,9 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
+// Admin credentials (for initial setup, change in production)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@example.com";
+const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
 // Models
 const User = mongoose.model("User", {
   name: String,
