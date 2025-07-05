@@ -92,7 +92,7 @@
 }
 
 .product-display-newprice {
-    color: #ff4141;
+    color: turquoise;
     font-size: 28px;
     font-weight: 700;
 }
@@ -167,9 +167,9 @@
 }
 
 .product-display-size-options button.selected {
-    background: #ff4141;
+    background: teal;
     color: white;
-    border-color: #ff4141;
+    border-color: thistle;
 }
 
 .quantity-selector {
@@ -207,7 +207,7 @@
     font-size: 16px;
     font-weight: 600;
     color: white;
-    background: #ff4141;
+    background: teal;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -216,7 +216,7 @@
 }
 
 .add-to-cart-btn:hover {
-    background: #e63939;
+    background: teal;
     transform: translateY(-2px);
 }
 
