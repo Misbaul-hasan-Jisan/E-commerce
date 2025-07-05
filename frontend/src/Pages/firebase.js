@@ -2,12 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBqZXerJpxxtkzfGUQJHAKzKOowTHwQbvE",
+  authDomain: "shopper-pro1.firebaseapp.com",
+  projectId: "shopper-pro1",
+  storageBucket: "shopper-pro1.firebasestorage.app",
+  messagingSenderId: "749122879504",
+  appId: "1:749122879504:web:082ff2a9694c627fe9ca95",
+  measurementId: "G-S8HG4WWB8P"
 };
 
 const app = initializeApp(firebaseConfig);
