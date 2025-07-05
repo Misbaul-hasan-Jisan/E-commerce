@@ -12,6 +12,16 @@ const bcrypt = require('bcryptjs');
 const sanitizeHtml = require('sanitize-html');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+  })
+});
 
 // Cloudinary configuration
 cloudinary.config({
@@ -77,9 +87,11 @@ const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
 const User = mongoose.model("User", {
   name: String,
   email: { type: String, unique: true },
-  password: String,
+  password: { type: String, required: false }, // Make password optional
   cartData: { type: Array, default: [] },
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now },
+  authMethod: { type: String, enum: ['local', 'google'], default: 'local' },
+  googleId: { type: String, unique: true, sparse: true }
 });
 
 const Product = mongoose.model("Product", {
@@ -254,7 +266,16 @@ app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    
     if (!user) return res.json({ success: false, error: "User not found" });
+    
+    // Check if user signed up with Google
+    if (user.authMethod === 'google') {
+      return res.json({ 
+        success: false, 
+        error: "Please sign in with Google" 
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.json({ success: false, error: "Wrong password" });
@@ -266,34 +287,53 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// In your backend route handler
-router.post('/google-auth', async (req, res) => {
+// Google Authentication Endpoint
+app.post('/google-auth', async (req, res) => {
   try {
     const { token, email, name } = req.body;
     
-    // Verify the Google token (using Firebase Admin SDK)
+    // Verify Google token
     const decodedToken = await admin.auth().verifyIdToken(token);
     
-    // Check if user exists
+    // Check if user exists by email
     let user = await User.findOne({ email });
-    
+
     if (!user) {
-      // Create new user if doesn't exist
+      // Create new user for Google auth
       user = new User({
-        username: name,
-        email,
-        authMethod: 'google'
+        name: sanitizeHtml(name),
+        email: sanitizeHtml(email),
+        authMethod: 'google',
+        googleId: decodedToken.uid
       });
       await user.save();
+    } else if (user.authMethod !== 'google') {
+      // Existing user with local auth
+      return res.status(400).json({ 
+        success: false, 
+        error: "Email already registered with password" 
+      });
     }
+
+    // Generate JWT token
+    const jwtToken = jwt.sign({ user: { id: user.id } }, process.env.JWT_SECRET || 'secret_ecom');
     
-    // Generate your JWT token
-    const jwtToken = generateToken(user._id);
-    
-    res.json({ success: true, token: jwtToken });
+    res.json({ 
+      success: true, 
+      token: jwtToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
   } catch (error) {
     console.error('Google auth error:', error);
-    res.status(400).json({ success: false, error: 'Authentication failed' });
+    res.status(400).json({ 
+      success: false, 
+      error: 'Authentication failed',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
