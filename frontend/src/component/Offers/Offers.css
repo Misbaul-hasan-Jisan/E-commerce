@@ -4,7 +4,7 @@
     display: flex;
     margin: 0 auto 150px;
     padding: 20px 5%;
-    background: linear-gradient(180deg, #688bad 0%, white);
+    background: linear-gradient(180deg, wheat 0%, white);
     border: 1px solid black;
     overflow: hidden;
     box-sizing: border-box;
@@ -44,7 +44,7 @@
     width: min(100%, 282px);
     height: 70px;
     border-radius: 35px;
-    background-color: #3bc9dc;
+    background-color: #688bad;
     border: none;
     color: black;
     font-size: clamp(16px, 2vw, 22px);
@@ -66,7 +66,21 @@
     height: auto;
     object-fit: contain;
 }
+.offers-right {
+    position: relative;
+}
 
+.offers-right::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(104, 139, 173, 0.3) 0%, rgba(255, 255, 255, 0.3) 100%);
+    z-index: 1;
+    mix-blend-mode: multiply;
+}
 /* ================== MEDIA QUERIES ================== */
 
 @media (max-width: 1024px) {
