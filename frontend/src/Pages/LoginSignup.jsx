@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react';
 import './CSS/LoginSignup.css';
 import { useNavigate } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
-import { signInWithGoogle } from '../firebase';
-import googleIcon from '../Assets/google-icon.png';
+import { signInWithGoogle } from './firebase';// Adjust the import path as necessary
+import googleIcon from '../component/Assets/google_icon.png';
 
 const LoginSignup = () => {
   const [state, setState] = useState("Login");
