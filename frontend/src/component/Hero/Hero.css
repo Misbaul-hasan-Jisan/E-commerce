@@ -1,10 +1,11 @@
-.hero{
+.hero {
     height: 100vh;
     background: linear-gradient(180deg, #688bad, white 60%);
     display: flex;
+    overflow: hidden; /* Prevents scrollbars during animations */
 }
 
-.hero-left{
+.hero-left {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -14,29 +15,30 @@
     line-height: 1.1;
 }
 
-.hero-left h2{
+.hero-left h2 {
     color: #090909;
     font-size: 26px;
     font-weight: 600;
 }
 
-.hero-left p{
+.hero-left p {
     color: #171717;
     font-size: 100px;
     font-weight: 700;
+    margin: 0; /* Removes default paragraph margins */
 }
 
-.hero-hand-icon{
+.hero-hand-icon {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
-.hero-hand-icon img{
+.hero-hand-icon img {
     width: 105px;
 }
 
-.hero-latest-button{
+.hero-latest-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -49,111 +51,111 @@
     color: black;
     font-size: 22px;
     font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.3s;
+    background: linear-gradient(45deg, #3bc9dc, #2aa8b8);
 }
 
-.hero-right{
+.hero-latest-button:hover {
+    transform: scale(1.05); /* Subtle hover effect */
+}
+
+.hero-right {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.hero-right img{
-    /* transform: scale(0.8); */
+.hero-right img {
     height: 600px;
+    object-fit: contain; /* Ensures image scales proportionally */
 }
 
-@media (max-width:1280px) {
-    .hero-left{
+/* Responsive Adjustments */
+@media (max-width: 1280px) {
+    .hero-left {
         padding-left: 100px;
     }
-    .hero-left h2{
+    .hero-left h2 {
         font-size: 22px;
     }
-    .hero-left p{
+    .hero-left p {
         font-size: 60px;
     }
-    .hero-hand-icon img{
+    .hero-hand-icon img {
         width: 80px;
     }
-    .hero-latest-button{
-        gap: 10px;
+    .hero-latest-button {
         width: 250px;
         height: 60px;
-        margin-top: 20px;
         font-size: 18px;
     }
-    .hero-right img{
-        width: 500px;
+    .hero-right img {
+        height: 500px;
     }
 }
 
-@media (max-width:1024px) {
-    .hero-left{
+@media (max-width: 1024px) {
+    .hero-left {
         padding-left: 80px;
     }
-    .hero-left h2{
+    .hero-left h2 {
         font-size: 20px;
     }
-    .hero-left p{
+    .hero-left p {
         font-size: 50px;
     }
-    .hero-hand-icon img{
+    .hero-hand-icon img {
         width: 65px;
     }
-    .hero-latest-button{
+    .hero-latest-button {
         width: 220px;
         height: 50px;
         font-size: 16px;
     }
-    .hero-right img{
-        width: 400px;
+    .hero-right img {
+        height: 400px;
     }
 }
 
-@media (max-width:800px) {
-    .hero-left{
-        padding-left: 30px;
-    }
-    .hero-left h2{
-        font-size: 16px;
-    }
-    .hero-left p{
-        font-size: 40px;
-    }
-    .hero-hand-icon img{
-        width: 50px;
-    }
-    .hero-latest-button{
-        width: 175px;
-        height: 40px;
-        font-size: 13px;
-    }
-    .hero-right img{
-        width: 300px;
-    }
-}
-
-@media (max-width:500px) {
-
-    .hero{
+@media (max-width: 800px) {
+    .hero {
         flex-direction: column;
+        text-align: center; /* Center-align content on mobile */
     }
-    .hero-right{
-        display: none;
+    .hero-left {
+        padding: 0 20px; /* Reduces side padding */
+        align-items: center; /* Centers content */
     }
-    .hero-left h2{
+    .hero-left h2 {
         font-size: 18px;
     }
-    .hero-left p{
-        font-size: 50px;
+    .hero-left p {
+        font-size: 40px;
     }
-    .hero-hand-icon img{
-        width: 55px;
+    .hero-hand-icon img {
+        width: 50px;
     }
-    .hero-latest-button{
+    .hero-latest-button {
         width: 200px;
         height: 45px;
         font-size: 14px;
+        margin: 20px auto; /* Centers button */
+    }
+    .hero-right {
+        padding: 20px 0; /* Adds spacing */
+    }
+    .hero-right img {
+        height: 300px; /* Smaller but visible on mobile */
+    }
+}
+
+@media (max-width: 500px) {
+    .hero-left p {
+        font-size: 36px; /* More mobile-friendly */
+    }
+    .hero-right img {
+        height: 250px; /* Tiny but present */
     }
 }

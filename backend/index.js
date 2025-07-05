@@ -265,6 +265,38 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// In your backend route handler
+router.post('/google-auth', async (req, res) => {
+  try {
+    const { token, email, name } = req.body;
+    
+    // Verify the Google token (using Firebase Admin SDK)
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    
+    // Check if user exists
+    let user = await User.findOne({ email });
+    
+    if (!user) {
+      // Create new user if doesn't exist
+      user = new User({
+        username: name,
+        email,
+        authMethod: 'google'
+      });
+      await user.save();
+    }
+    
+    // Generate your JWT token
+    const jwtToken = generateToken(user._id);
+    
+    res.json({ success: true, token: jwtToken });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(400).json({ success: false, error: 'Authentication failed' });
+  }
+});
+
 // Get all orders (No admin check)
 app.get('/all-orders', async (req, res) => {
   try {
