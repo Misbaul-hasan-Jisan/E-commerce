@@ -85,13 +85,13 @@
   color: #515151;
   font-size: 16px;
   font-weight: 500;
-  background: seashell;
+  background: azure;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .nav-login-cart button:hover {
-  background: black;
+  background: paleturquoise;
 }
 
 .nav-login-cart img {
